@@ -1,0 +1,16 @@
+syntax="proto3";
+package spin;
+
+service Container {
+    rpc SpinContainer (ContainerRequest) returns (ContainerResponse);
+}
+
+message ContainerRequest {
+    uint32 percent = 1;
+}
+
+message ContainerResponse {
+    bool successful = 1;
+    string hostname = 2;
+    string port = 3;
+}
