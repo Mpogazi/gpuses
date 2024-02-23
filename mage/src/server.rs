@@ -3,9 +3,14 @@ use tonic::{{transport::Server, Request, Response, Status}};
 use spin::container_server::{Container, ContainerServer};
 use spin::{ContainerRequest, ContainerResponse};
 
+pub mod docker;
+use docker::invoker::Invoker;
+
+
 pub mod spin {
     tonic::include_proto!("spin");
 }
+
 
 #[derive(Debug, Default)]
 pub struct ContainerService {}
@@ -36,6 +41,9 @@ impl Container for ContainerService {
 
 #[tokio::main]
 async fn main() -> Result<(), Box<dyn std::error::Error>> {
+    let invoker = Invoker::new();
+    invoker.images().await;
+
     let addr = "[::1]:50051".parse()?;
     let container_service = ContainerService::default();
 

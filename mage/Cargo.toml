@@ -9,9 +9,12 @@ name="mage-server"
 path="src/server.rs"
 
 [dependencies]
+bollard="*"
+futures-util="0.3.30"
 tonic="0.7"
 prost="0.10"
 tokio= { version="1.0", features=["macros", "rt-multi-thread"]}
 
 [build-dependencies]
 tonic-build = "0.7"
+
