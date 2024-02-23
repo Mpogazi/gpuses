@@ -42,7 +42,7 @@ impl Container for ContainerService {
 #[tokio::main]
 async fn main() -> Result<(), Box<dyn std::error::Error>> {
     let invoker = Invoker::new();
-    invoker.images().await;
+    let _ = invoker.images().await;
 
     let addr = "[::1]:50051".parse()?;
     let container_service = ContainerService::default();
