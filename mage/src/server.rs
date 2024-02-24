@@ -5,6 +5,7 @@ use spin::{ContainerRequest, ContainerResponse};
 
 pub mod docker;
 use docker::invoker::Invoker;
+use docker::system::SystemInfo;
 
 
 pub mod spin {
@@ -43,6 +44,10 @@ impl Container for ContainerService {
 async fn main() -> Result<(), Box<dyn std::error::Error>> {
     let invoker = Invoker::new();
     let _ = invoker.images().await;
+    let _ = invoker.run_container().await;
+
+    let mut system_info = SystemInfo::new();
+    system_info.show();
 
     let addr = "[::1]:50051".parse()?;
     let container_service = ContainerService::default();

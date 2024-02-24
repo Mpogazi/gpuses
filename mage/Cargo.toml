@@ -13,8 +13,10 @@ bollard="*"
 futures-util="0.3.30"
 tonic="0.7"
 prost="0.10"
-tokio= { version="1.0", features=["macros", "rt-multi-thread"]}
+tokio={ version="1.0", features=["macros", "rt-multi-thread"]}
+sysinfo="0.30.5"
+rand="0.8.5"
+
 
 [build-dependencies]
 tonic-build = "0.7"
-
