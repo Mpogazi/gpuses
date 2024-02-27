@@ -5,8 +5,6 @@ use spin::{ContainerRequest, ContainerResponse};
 
 pub mod docker;
 use docker::invoker::Invoker;
-use docker::system::SystemInfo;
-
 
 pub mod spin {
     tonic::include_proto!("spin");
@@ -42,12 +40,8 @@ impl Container for ContainerService {
 
 #[tokio::main]
 async fn main() -> Result<(), Box<dyn std::error::Error>> {
-    let invoker = Invoker::new();
-    let _ = invoker.images().await;
-    let _ = invoker.run_container().await;
-
-    let mut system_info = SystemInfo::new();
-    system_info.show();
+    let mut invoker = Invoker::new();
+    invoker.start_image().await;
 
     let addr = "[::1]:50051".parse()?;
     let container_service = ContainerService::default();
