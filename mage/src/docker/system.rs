@@ -15,19 +15,12 @@ impl SystemInfo {
 
     pub fn show(&mut self) {
         self.system.refresh_all();
-        println!("CPUS:");
 
         let available_cpus = self.system.cpus().iter().filter(|cpu_instance| cpu_instance.cpu_usage() < 90.0);
         
-        for cpu in available_cpus {
-            println!("{:?}", cpu);
-        }
+        println!("CPUS available: {}", available_cpus.count());
 
         self.components.refresh_list();
-        println!("GPUs (if available):");
-        
-        for component in self.components.list() {
-            println!("{:?}", component);
-        } 
+        println!("GPUs (if available): {}", self.components.list().len());
     }
 }

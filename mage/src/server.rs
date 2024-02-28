@@ -8,6 +8,9 @@ use docker::invoker::Invoker;
 
 pub mod spin {
     tonic::include_proto!("spin");
+
+    pub(crate) const FILE_DESCRIPTOR_SET: &[u8] = 
+        tonic::include_file_descriptor_set!("spin_descriptor");
 }
 
 
@@ -44,9 +47,16 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     invoker.start_image().await;
 
     let addr = "[::1]:50051".parse()?;
+
     let container_service = ContainerService::default();
+    let container_service_build = tonic_reflection::server::Builder::configure()
+        .register_encoded_file_descriptor_set(spin::FILE_DESCRIPTOR_SET)
+        .build()
+        .unwrap();
+    
 
     Server::builder()
+        .add_service(container_service_build)
         .add_service(ContainerServer::new(container_service))
         .serve(addr)
         .await?;
