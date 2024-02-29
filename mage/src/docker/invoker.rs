@@ -15,7 +15,7 @@ impl Invoker {
     }
 
     pub async fn start_image(&mut self) {
-        self.system_info.show();
-        self.images.start_image().await.unwrap();
+        println!("Available memory cpu percentage: {}", self.system_info.idle_cpu());
+        self.system_info.idle_gpu();
     }
 }
