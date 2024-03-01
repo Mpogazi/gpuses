@@ -1,5 +1,5 @@
-use sysinfo::{System, Components, CpuRefreshKind, RefreshKind};
-use machine_info::{Machine};
+use sysinfo::{System, CpuRefreshKind, RefreshKind};
+use machine_info::Machine;
 
 
 pub struct SystemInfo {
@@ -23,7 +23,5 @@ impl SystemInfo {
         (100.00 - self.system.global_cpu_info().cpu_usage()) as f32
     }
 
-    pub fn idle_gpu(&mut self) {
-        println!("available GPU memory: {:?}", machine_info::GraphicCard);
-    }
+    pub fn idle_gpu(&mut self) {}
 }

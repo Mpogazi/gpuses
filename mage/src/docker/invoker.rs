@@ -3,19 +3,26 @@ use super::system::SystemInfo;
 
 pub struct Invoker {
     system_info: SystemInfo,
-    images: Images
+    images: Images,
 }
 
 impl Invoker {
     pub fn new() -> Invoker {
         Invoker {
             system_info: SystemInfo::new(),
-            images: Images::new()
+            images: Images::new(),
         }
     }
 
     pub async fn start_image(&mut self) {
-        println!("Available memory cpu percentage: {}", self.system_info.idle_cpu());
+        println!(
+            "Available memory cpu percentage: {}",
+            self.system_info.idle_cpu()
+        );
         self.system_info.idle_gpu();
+        println!(
+            "Starting an image: {:?}",
+            self.images.start_image(1.0, 1.0, 1.0).await.unwrap()
+        );
     }
 }
