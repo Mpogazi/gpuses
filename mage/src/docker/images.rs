@@ -2,6 +2,9 @@ use bollard::container::{Config, CreateContainerOptions, StartContainerOptions};
 use bollard::errors::Error;
 use bollard::secret::HostConfig;
 use bollard::Docker;
+use bollard::models::PortBinding;
+
+use std::collections::HashMap;
 
 use rand::Rng;
 
@@ -27,23 +30,20 @@ impl Images {
 
     pub async fn start_image(
         &self,
-        memory: f32,
-        cpu: f32,
-        gpu: f32,
+        _memory: f32,
+        _cpu: f32,
+        _gpu: f32,
     ) -> Result<ContainerProperties, Error> {
         let config = Config {
             image: Some("ubuntu"),
-            cmd: Some(vec!["/bin/bash"]),
+            cmd: Some(vec!["/bin/bash", "-c", "apt-get update && apt-get install -y openssh-server && service ssh start && sleep infinity"]),
             host_config: Some(HostConfig {
-                port_bindings: Some(
-                    [(
-                        "22/tcp".to_string(),
-                        Some(vec![("127.0.0.1".to_string(), "2222".to_string())]),
-                    )]
-                    .iter()
-                    .cloned()
-                    .collect(),
-                ),
+                port_bindings: Some(HashMap::from([
+                    (String::from("22/tcp"), Some(vec![PortBinding {
+                        host_ip: Some(String::from("127.0.0.1")),
+                        host_port: Some(String::from("2222")),
+                    }])),
+                ])),
                 ..Default::default()
             }),
             ..Default::default()
@@ -56,14 +56,11 @@ impl Images {
 
         let container = self
             .docker
-            .create_container(Some(container_options), config)
+            .create_container(Some(container_options.clone()), config)
             .await
             .expect("Failed to create container");
 
-        self.docker
-            .start_container(&container.id, None::<StartContainerOptions<String>>)
-            .await
-            .expect("Failed to start container");
+        self.docker.start_container(&container.id, None::<StartContainerOptions<String>>).await.unwrap();
 
         let container_properties: ContainerProperties = ContainerProperties {
             id: container.id.clone(),
