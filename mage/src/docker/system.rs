@@ -1,16 +1,16 @@
 use sysinfo::{System, CpuRefreshKind, RefreshKind};
-use machine_info::Machine;
+//use machine_info::Machine;
 
 
 pub struct SystemInfo {
-    machine: Machine,
+    //machine: Machine,
     system: System,
 }
 
 impl SystemInfo {
     pub fn new() -> SystemInfo {
         SystemInfo {
-            machine: Machine::new(),
+            //machine: Machine::new(),
             system: System::new_with_specifics(
                 RefreshKind::new().with_cpu(CpuRefreshKind::everything()),
             ),

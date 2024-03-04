@@ -1,10 +1,11 @@
 use bollard::container::{Config, CreateContainerOptions, StartContainerOptions};
 use bollard::errors::Error;
+use bollard::models::PortBinding;
 use bollard::secret::HostConfig;
 use bollard::Docker;
-use bollard::models::PortBinding;
 
 use std::collections::HashMap;
+use std::process::Command;
 
 use rand::Rng;
 
@@ -28,22 +29,56 @@ impl Images {
         }
     }
 
+    async fn image_exists(&self, image: &str) -> bool {
+        match self.docker.inspect_image(image).await {
+            Ok(_) => true,
+            Err(_) => false,
+        }
+    }
+
+    async fn build_image(&self) {
+        let path = "src/config/Dockerfile";
+        let image = "kowry_ubuntu:latest";
+
+        if self.image_exists(image).await {
+            println!("Image already exists!");
+        } else {
+            let status = Command::new("docker")
+                .arg("build")
+                .arg("-t")
+                .arg(image)
+                .arg("-f")
+                .arg(path)
+                .arg(".")
+                .status()
+                .expect("Failed to start Docker build process");
+
+            if status.success() {
+                println!("Docker image built successfully!");
+            } else {
+                eprintln!("Failed to build Docker image");
+            }
+        }
+    }
+
     pub async fn start_image(
         &self,
         _memory: f32,
         _cpu: f32,
         _gpu: f32,
     ) -> Result<ContainerProperties, Error> {
+        self.build_image().await;
         let config = Config {
-            image: Some("ubuntu"),
-            cmd: Some(vec!["/bin/bash", "-c", "apt-get update && apt-get install -y openssh-server && service ssh start && sleep infinity"]),
+            image: Some("kowry_ubuntu"),
+            cmd: Some(vec![]),
             host_config: Some(HostConfig {
-                port_bindings: Some(HashMap::from([
-                    (String::from("22/tcp"), Some(vec![PortBinding {
+                port_bindings: Some(HashMap::from([(
+                    String::from("22/tcp"),
+                    Some(vec![PortBinding {
                         host_ip: Some(String::from("127.0.0.1")),
                         host_port: Some(String::from("2222")),
-                    }])),
-                ])),
+                    }]),
+                )])),
                 ..Default::default()
             }),
             ..Default::default()
@@ -60,7 +95,10 @@ impl Images {
             .await
             .expect("Failed to create container");
 
-        self.docker.start_container(&container.id, None::<StartContainerOptions<String>>).await.unwrap();
+        self.docker
+            .start_container(&container.id, None::<StartContainerOptions<String>>)
+            .await
+            .unwrap();
 
         let container_properties: ContainerProperties = ContainerProperties {
             id: container.id.clone(),
