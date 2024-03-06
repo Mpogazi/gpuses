@@ -4,10 +4,11 @@ use bollard::models::PortBinding;
 use bollard::secret::HostConfig;
 use bollard::Docker;
 
+use rand::Rng;
 use std::collections::HashMap;
 use std::process::Command;
 
-use rand::Rng;
+use super::keys::KeyGenerator;
 
 #[derive(Debug)]
 pub struct ContainerProperties {
@@ -16,16 +17,19 @@ pub struct ContainerProperties {
     pub is_running: bool,
     pub created: bool,
     pub started: bool,
+    pub ssh_key: String,
 }
 
 pub struct Images {
     docker: Docker,
+    key_generator: KeyGenerator,
 }
 
 impl Images {
     pub fn new() -> Images {
         Images {
             docker: Docker::connect_with_local_defaults().unwrap(),
+            key_generator: KeyGenerator::new(),
         }
     }
 
@@ -36,7 +40,15 @@ impl Images {
         }
     }
 
-    async fn build_image(&self) {
+    async fn create_ssh_key(&self, container_name: &str) -> Result<String, String> {
+        let save_name = format!(".keys/{}", container_name);
+        match self.key_generator.generate_key(&save_name).await {
+            true => Ok(save_name),
+            false => Err("Failed to generate SSH key".to_string()),
+        }
+    }
+
+    async fn build_image(&self, key_path: &str) {
         let path = "src/config/Dockerfile";
         let image = "kowry_ubuntu:latest";
 
@@ -45,6 +57,8 @@ impl Images {
         } else {
             let status = Command::new("docker")
                 .arg("build")
+                .arg("--build-arg")
+                .arg(format!("SSH_KEY_PATH={}.pub", key_path))
                 .arg("-t")
                 .arg(image)
                 .arg("-f")
@@ -67,27 +81,13 @@ impl Images {
         _cpu: f32,
         _gpu: f32,
     ) -> Result<ContainerProperties, Error> {
-        self.build_image().await;
-        let config = Config {
-            image: Some("kowry_ubuntu"),
-            cmd: Some(vec![]),
-            host_config: Some(HostConfig {
-                port_bindings: Some(HashMap::from([(
-                    String::from("22/tcp"),
-                    Some(vec![PortBinding {
-                        host_ip: Some(String::from("127.0.0.1")),
-                        host_port: Some(String::from("2222")),
-                    }]),
-                )])),
-                ..Default::default()
-            }),
-            ..Default::default()
-        };
+        let container_name = format!("container_{}", rand::thread_rng().gen_range(0..10000));
+        let key_path = self.create_ssh_key(&container_name).await.unwrap();
 
-        let container_options = CreateContainerOptions {
-            name: format!("container_{}", rand::thread_rng().gen_range(0..10000)),
-            platform: Some(format!("arm64")),
-        };
+        self.build_image(&key_path).await;
+
+        let config = self.create_config();
+        let container_options = self.create_container_options(container_name.as_str());
 
         let container = self
             .docker
@@ -102,11 +102,37 @@ impl Images {
 
         let container_properties: ContainerProperties = ContainerProperties {
             id: container.id.clone(),
-            name: container_options.name.clone(),
+            name: container_options.name.clone().to_owned(),
             is_running: true,
             created: true,
             started: true,
+            ssh_key: key_path,
         };
         Ok(container_properties)
+    }
+
+    pub fn create_config(&self) -> Config<&str> {
+        Config {
+            image: Some("kowry_ubuntu"),
+            cmd: Some(vec![]),
+            host_config: Some(HostConfig {
+                port_bindings: Some(HashMap::from([(
+                    String::from("22/tcp"),
+                    Some(vec![PortBinding {
+                        host_ip: Some(String::from("127.0.0.1")),
+                        host_port: Some(String::from("2222")),
+                    }]),
+                )])),
+                ..Default::default()
+            }),
+            ..Default::default()
+        }
+    }
+
+    pub fn create_container_options(&self, container_name: &str) -> CreateContainerOptions<String> {
+        CreateContainerOptions {
+            name: String::from(container_name),
+            platform: Some(format!("arm64")),
+        }
     }
 }
