@@ -5,11 +5,12 @@ use spin::{ContainerRequest, ContainerResponse};
 
 pub mod docker;
 use docker::invoker::Invoker;
-use docker::system::SystemInfo;
-
 
 pub mod spin {
     tonic::include_proto!("spin");
+
+    pub(crate) const FILE_DESCRIPTOR_SET: &[u8] = 
+        tonic::include_file_descriptor_set!("spin_descriptor");
 }
 
 
@@ -42,17 +43,20 @@ impl Container for ContainerService {
 
 #[tokio::main]
 async fn main() -> Result<(), Box<dyn std::error::Error>> {
-    let invoker = Invoker::new();
-    let _ = invoker.images().await;
-    let _ = invoker.run_container().await;
-
-    let mut system_info = SystemInfo::new();
-    system_info.show();
+    let mut invoker = Invoker::new();
+    invoker.start_image().await;
 
     let addr = "[::1]:50051".parse()?;
+
     let container_service = ContainerService::default();
+    let container_service_build = tonic_reflection::server::Builder::configure()
+        .register_encoded_file_descriptor_set(spin::FILE_DESCRIPTOR_SET)
+        .build()
+        .unwrap();
+    
 
     Server::builder()
+        .add_service(container_service_build)
         .add_service(ContainerServer::new(container_service))
         .serve(addr)
         .await?;
