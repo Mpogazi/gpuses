@@ -11,7 +11,7 @@
 	
 		<div class="text-white bg-blue-400 py-2 px-3 rounded-xl">
 			<button>
-				Contact sales
+				<a href="https://airtable.com/appp5FBXNVaHbzgae/pagK4KyMhzALBsyFQ/form">Contact sales</a>
 			</button>
 		</div>
 	</div>
