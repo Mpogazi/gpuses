@@ -4,20 +4,23 @@ version = "0.1.0"
 edition = "2021"
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+[profile.release]
+panic = 'abort'
+
 [[bin]]
-name="mage-server"
-path="src/server.rs"
+name = "mage-server"
+path = "src/server.rs"
 
 [dependencies]
-bollard="*"
-futures-util="0.3.30"
-tonic="0.11"
-prost="0.12"
-tokio={ version="1", features=["macros", "rt-multi-thread"]}
-sysinfo="0.30.5"
-rand="0.8.5"
-tonic-reflection="0.11"
-nvml-wrapper="0.10.0"
+bollard = "*"
+futures-util = "0.3.30"
+tonic = "0.11"
+prost = "0.12"
+tokio = { version = "1", features = ["macros", "rt-multi-thread"] }
+sysinfo = "0.30.5"
+rand = "0.8.5"
+tonic-reflection = "0.11"
+nvml-wrapper = "0.10.0"
 machine-info = "1.0.9"
 
 

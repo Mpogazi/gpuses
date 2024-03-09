@@ -15,7 +15,9 @@ pub mod spin {
 
 
 #[derive(Debug, Default)]
-pub struct ContainerService {}
+pub struct ContainerService {
+    // invoker: Invoker
+}
 
 #[tonic::async_trait]
 impl Container for ContainerService {

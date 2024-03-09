@@ -6,7 +6,8 @@ service Container {
 }
 
 message ContainerRequest {
-    uint32 percent = 1;
+    string user_id = 1;
+    uint32 percent = 2;
 }
 
 message ContainerResponse {
