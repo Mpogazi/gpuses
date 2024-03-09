@@ -2,3 +2,4 @@ mage/target
 mage/target/debug/*
 mage/.keys
 mage/.keys/*
+.vercel
