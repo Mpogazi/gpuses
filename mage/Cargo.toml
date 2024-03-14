@@ -22,6 +22,8 @@ rand = "0.8.5"
 tonic-reflection = "0.11"
 nvml-wrapper = "0.10.0"
 machine-info = "1.0.9"
+vaultrs = "0.12.0"
+openssl = { version = "0.10", features = ["vendored"] }
 
 
 [build-dependencies]
