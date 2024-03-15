@@ -1,0 +1,27 @@
+syntax = "proto3";
+
+package auth.v1;
+
+option go_package = "github.com/Mpogazi/gpuses/server/auth/v1";
+
+message CreateAccountRequest {
+    string email = 1;
+    string password = 2;
+}
+
+message CreateAccountResponse {
+    string id = 1;
+    string ssh_key = 2;
+}
+
+message StartSessionRequest {
+    string id = 1;
+    string ssh_key = 2;
+}
+
+message StartSessionResponse {
+    string id = 1;
+    string ssh_key = 2;
+    string host = 3;
+    int32 port = 4;
+}
