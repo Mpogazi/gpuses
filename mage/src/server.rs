@@ -4,7 +4,9 @@ use spin::container_server::{Container, ContainerServer};
 use spin::{ContainerRequest, ContainerResponse};
 
 pub mod docker;
+pub mod auth;
 use docker::invoker::Invoker;
+use auth::keys::Keys;
 
 pub mod spin {
     tonic::include_proto!("spin");
@@ -39,14 +41,25 @@ impl Container for ContainerService {
 
         Ok(Response::new(reply))
     }
-    
 }
 
 
 #[tokio::main]
 async fn main() -> Result<(), Box<dyn std::error::Error>> {
-    let mut invoker = Invoker::new();
-    invoker.start_image().await;
+    // let mut invoker = Invoker::new();
+    let keys = Keys::new();
+    // invoker.start_image().await;
+    
+    match keys.generate() {
+        Ok((private_key, public_key)) => {
+            println!("Private Key: {}", private_key);
+            println!("Public Key: {}", public_key);
+        }
+        Err(e) => {
+            println!("Error: {}", e);
+        }
+    }
+
 
     let addr = "[::1]:50051".parse()?;
 
