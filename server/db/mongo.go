@@ -8,7 +8,7 @@ import (
 	"go.mongodb.org/mongo-driver/mongo/options"
 )
 
-func ConnectToMongoDB() (*mongo.Client, error) {
+func ConnectToMongoDB(client *mongo.Client, dbName string) (*mongo.Database, error) {
 	config, err := util.LoadConfig(".")
 	if err != nil {
 		return nil, err
