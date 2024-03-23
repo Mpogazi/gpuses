@@ -4,6 +4,11 @@ package auth.v1;
 
 option go_package = "github.com/Mpogazi/gpuses/server/auth/v1";
 
+service Auth {
+    rpc CreateAccount(CreateAccountRequest) returns (CreateAccountResponse) {}
+    rpc StartSession(StartSessionRequest) returns (StartSessionResponse) {}
+}
+
 message CreateAccountRequest {
     string email = 1;
     string password = 2;
