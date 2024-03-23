@@ -7,8 +7,7 @@ use bollard::Docker;
 use rand::Rng;
 use std::collections::HashMap;
 use std::process::Command;
-
-use super::keys::KeyGenerator;
+use crate::auth::keys::Keys;
 
 #[derive(Debug)]
 pub struct ContainerProperties {
@@ -22,7 +21,7 @@ pub struct ContainerProperties {
 
 pub struct Images {
     docker: Docker,
-    key_generator: KeyGenerator,
+    key_generator: Keys,
 }
 
 impl Images {
@@ -30,7 +29,7 @@ impl Images {
         Images {
             docker: Docker::connect_with_local_defaults()
                 .expect("Failed to connect to the docker daemon"),
-            key_generator: KeyGenerator::new(),
+            key_generator: Keys::new(),
         }
     }
 
@@ -152,14 +151,15 @@ impl Images {
 
     async fn create_ssh_key(&self, container_name: &str) -> Result<String, String> {
         let save_name = format!(".keys/{}", container_name);
-        match self.key_generator.generate_key(&save_name).await {
-            true => Ok(save_name),
-            false => Err("Failed to generate SSH key".to_string()),
-        }
+        // match self.key_generator.generate_key(&save_name).await {
+        //     true => Ok(save_name),
+        //     false => Err("Failed to generate SSH key".to_string()),
+        // }
+        Ok("".to_string())
     }
 
     async fn clean_up(&self, container_name: &str) {
         let save_name = format!(".keys/{}", container_name);
-        self.key_generator.delete_key(&save_name).await;
+        //self.key_generator.delete_key(&save_name).await;
     }
 }

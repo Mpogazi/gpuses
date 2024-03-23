@@ -47,18 +47,21 @@ impl Container for ContainerService {
 #[tokio::main]
 async fn main() -> Result<(), Box<dyn std::error::Error>> {
     // let mut invoker = Invoker::new();
-    let keys = Keys::new();
+    //let keys = Keys::new();
     // invoker.start_image().await;
     
-    match keys.generate() {
-        Ok((private_key, public_key)) => {
-            println!("Private Key: {}", private_key);
-            println!("Public Key: {}", public_key);
-        }
-        Err(e) => {
-            println!("Error: {}", e);
-        }
-    }
+    // match keys.generate() {
+    //     Ok((private_key, public_key)) => {
+    //         println!("Private Key: {}", private_key);
+    //         println!("Public Key: {}", public_key);
+    //     }
+    //     Err(e) => {
+    //         println!("Error: {}", e);
+    //     }
+    // }
+    let keys = Keys::new();
+    println!("Private Key: {}", keys.generate("user_id".to_string()).await.unwrap());
+    println!("Public Key (fetched): {}", keys.get_key("user_id").await.unwrap());
 
 
     let addr = "[::1]:50051".parse()?;
