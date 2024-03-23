@@ -14,7 +14,6 @@ type Config struct {
 	MongoURI             string        `mapstructure:"MONGO_URI"`
 }
 
-
 func LoadConfig(path string) (config Config, err error) {
 	viper.AddConfigPath(path)
 	viper.SetConfigName(".env")

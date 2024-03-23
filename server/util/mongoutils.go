@@ -12,7 +12,7 @@ var (
 	SecondaryPreferredDatabaseOption = options.Database().SetReadPreference(readpref.SecondaryPreferred())
 
 	globalDBOptsMu sync.RWMutex
-	globalDBOpts []*options.DatabaseOptions
+	globalDBOpts   []*options.DatabaseOptions
 )
 
 func GloabalDatabaseOptions() []*options.DatabaseOptions {

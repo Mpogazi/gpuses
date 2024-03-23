@@ -30,6 +30,11 @@ type profilingDatabase struct {
 	defaultSamplingProbability float64
 }
 
+// DeleteUser implements Database.
+func (p *profilingDatabase) DeleteUser(ctx context.Context, id string) error {
+	panic("unimplemented")
+}
+
 type TraceSpan struct {
 	Span *trace.Span
 }
