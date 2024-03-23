@@ -56,11 +56,11 @@ func (ts *TraceSpan) AddAttribute(key, value string) {
 	ts.Span.AddAttributes(trace.StringAttribute(key, value))
 }
 
-func (ps *profilerSpan) addUserEmail(ctx context.Context, email string) {
+func (ps *profilerSpan) addUserEmail(email string) {
 	ps.AddAttribute("email", email)
 }
 
-func (ps *profilerSpan) addUserID(ctx context.Context, id string) {
+func (ps *profilerSpan) addUserID(id string) {
 	ps.AddAttribute("id", id)
 }
 
@@ -68,7 +68,7 @@ func (ps *profilerSpan) addUserID(ctx context.Context, id string) {
 func (p *profilingDatabase) UserByEmail(ctx context.Context, email string) (*User, error) {
 	ctx, span := newProfilerSpan(ctx, p.prefix, "UserByEmail", p.defaultSamplingProbability/2)
 	defer span.End()
-	span.addUserEmail(ctx, email)
+	span.addUserEmail(email)
 
 	return p.actual.UserByEmail(ctx, email)
 }
@@ -77,6 +77,7 @@ func (p *profilingDatabase) UserByEmail(ctx context.Context, email string) (*Use
 func (p *profilingDatabase) UserByID(ctx context.Context, id string) (*User, error) {
 	ctx, span := newProfilerSpan(ctx, p.prefix, "UserByID", p.defaultSamplingProbability/2)
 	defer span.End()
+	span.addUserID(id)
 
 	return p.actual.UserByID(ctx, id)
 }
