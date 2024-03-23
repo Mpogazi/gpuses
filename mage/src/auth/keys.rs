@@ -5,6 +5,7 @@ use vaultrs::api::kv2::responses::SecretVersionMetadata;
 use vaultrs::client::{VaultClient, VaultClientSettingsBuilder};
 use vaultrs::error::ClientError;
 use vaultrs::kv2;
+use std::env;
 
 #[derive(Debug, Deserialize, Serialize)]
 pub struct Key {
@@ -18,11 +19,13 @@ pub struct Keys {
 
 impl Keys {
     pub fn new() -> Keys {
+        let vault_addr = env::var("VAULT_ADDR").unwrap();
+        let vault_token = env::var("VAULT_TOKEN").unwrap();
         Keys {
             vault_client: VaultClient::new(
                 VaultClientSettingsBuilder::default()
-                    .address("http://127.0.0.1:8200")
-                    .token("hvs.dDyruCH0wAjMW2jMlE7P3oOH")
+                    .address(vault_addr)
+                    .token(vault_token)
                     .build()
                     .unwrap(),
             )
